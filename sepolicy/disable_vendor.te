@@ -1,0 +1,11 @@
+type disable_vendor, domain, mlstrustedsubject;
+type disable_vendor_exec, exec_type, file_type;
+
+domain_auto_trans(init, disable_vendor_exec, disable_vendor);
+allow disable_vendor { shell_exec toolbox_exec system_file }:file rx_file_perms;
+allow disable_vendor proc_filesystems:file { r_file_perms };
+allow disable_vendor vendor_overlay_file:file { mounton };
+allow disable_vendor vendor_configs_file:dir { mounton };
+allow disable_vendor tmpfs:dir { r_dir_perms };
+allow disable_vendor init_tmpfs:file { r_file_perms };
+allow disable_vendor self:capability { sys_admin };

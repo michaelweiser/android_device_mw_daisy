@@ -1,0 +1,55 @@
+type fix_keymaster, domain, mlstrustedsubject;
+type fix_keymaster_exec, exec_type, file_type;
+
+domain_auto_trans(init, fix_keymaster_exec, fix_keymaster);
+
+# denied { getattr } for path="/system/bin/sh" scontext=u:r:fix_keymaster:s0
+#  tcontext=u:object_r:shell_exec:s0 tclass=file
+# denied { execute_no_trans } for path="/system/bin/grep" scontext=u:r:fix_keymaster:s0
+#  tcontext=u:object_r:system_file:s0 tclass=file
+# denied { getattr } for path="/system/bin/toolbox" scontext=u:r:fix_keymaster:s0
+#  tcontext=u:object_r:toolbox_exec:s0 tclass=file
+allow fix_keymaster { shell_exec toolbox_exec system_file }:file { rx_file_perms };
+
+# denied { getattr } for pid=473 comm="find" scontext=u:r:fix_keymaster:s0
+#  tcontext=u:object_r:block_device:s0 tclass=dir
+allow fix_keymaster block_device:dir { getattr search read open };
+allow fix_keymaster dev_type:blk_file { getattr };
+
+# denied { read, open } for pid=476 comm="getSPL" scontext=u:r:fix_keymaster:s0
+#  tcontext=u:object_r:boot_block_device:s0 tclass=blk_file
+allow fix_keymaster boot_block_device:blk_file { r_file_perms };
+
+# denied  { set } for property=ro.keymaster.xxx.release scontext=u:r:fix_keymaster:s0
+#  tcontext=u:object_r:default_prop:s0 tclass=property_service
+allow fix_keymaster property_type:property_service { set };
+# denied { write } for pid=484 comm="setprop" scontext=u:r:fix_keymaster:s0
+#  tcontext=u:object_r:property_socket:s0 tclass=sock_file
+allow fix_keymaster property_socket:sock_file { write };
+# denied { connectto } for pid=486 comm="setprop" path="/dev/socket/property_service"
+#  scontext=u:r:fix_keymaster:s0 tcontext=u:r:init:s0 tclass=unix_stream_socket
+allow fix_keymaster init:unix_stream_socket { connectto };
+
+# denied { sys_resource } for capability=24 scontext=u:r:fix_keymaster:s0
+#  tcontext=u:r:fix_keymaster:s0 tclass=capability
+allow fix_keymaster self:global_capability_class_set { sys_resource };
+
+# denied { search } for pid=484 comm="cp" name="/" scontext=u:r:fix_keymaster:s0
+#  tcontext=u:object_r:tmpfs:s0 tclass=dir
+allow fix_keymaster fs_type:dir { search };
+allow fix_keymaster tmpfs:dir { rw_dir_perms };
+allow fix_keymaster tmpfs:file { rw_file_perms create setattr rename relabelfrom unlink };
+
+# denied { read } for pid=502 comm="mount" name="filesystems" dev="proc"
+#  scontext=u:r:fix_keymaster:s0 tcontext=u:object_r:proc_filesystems:s0 tclass=file
+allow fix_keymaster proc_filesystems:file { r_file_perms };
+
+# denied { mounton } for pid=496 comm="mount"
+#  path="/vendor/lib64/hw/android.hardware.keymaster@3.0-impl-qti.so"
+#  dev="mmcblk0p58" ino=1075 scontext=u:r:fix_keymaster:s0
+#  tcontext=u:object_r:vendor_file:s0 tclass=file
+allow fix_keymaster { system_file vendor_file}:file { mounton relabelto };
+
+# denied { sys_admin } for pid=494 comm="mount" scontext=u:r:fix_keymaster:s0
+#  tcontext=u:r:fix_keymaster:s0 tclass=capability
+allow fix_keymaster self:capability { sys_admin };

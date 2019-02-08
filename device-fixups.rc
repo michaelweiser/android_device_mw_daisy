@@ -1,0 +1,19 @@
+# https://github.com/phhusson/device_phh_treble/blob/android-9.0/vndk.rc
+on post-fs
+	setprop sys.usb.ffs.aio_compat true
+	setprop ro.keymaster.mod "AOSP on ARM64"
+	mkdir /mnt/fix-keymaster
+	mount tmpfs tmpfs /mnt/fix-keymaster rw,nodev,relatime mode=1755,gid=0
+	exec - root -- /system/bin/fix-keymaster.sh
+
+on post-fs
+	# empty file and directory to mask stuff (via bind mounting) we don't
+	# want the system to see
+	mkdir /mnt/disable-vendor
+	mount tmpfs tmpfs /mnt/disable-vendor rw,nodev,relatime mode=1755,gid=0
+	write /mnt/disable-vendor/empty ""
+	mkdir /mnt/disable-vendor/empty_dir
+	exec - root -- /system/bin/disable-vendor.sh
+
+on property:sys.boot_completed=1
+	exec - root -- /system/bin/resize-userdata.sh

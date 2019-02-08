@@ -1,0 +1,3 @@
+/system/bin/fix-keymaster.sh u:object_r:fix_keymaster_exec:s0
+/system/bin/disable-vendor.sh u:object_r:disable_vendor_exec:s0
+/system/bin/resize-userdata.sh u:object_r:resize_userdata_exec:s0

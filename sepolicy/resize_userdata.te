@@ -1,0 +1,9 @@
+type resize_userdata, domain, mlstrustedsubject;
+type resize_userdata_exec, exec_type, file_type;
+
+domain_auto_trans(init, resize_userdata_exec, resize_userdata);
+allow resize_userdata { shell_exec system_file }:file rx_file_perms;
+allow resize_userdata proc_swaps:file { r_file_perms };
+allow resize_userdata block_device:dir { getattr search read open };
+allow resize_userdata dev_type:blk_file { getattr };
+allow resize_userdata toolbox_exec:file { getattr };
